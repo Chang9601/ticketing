@@ -15,6 +15,17 @@ spec:
       containers:
         - name: auth
           image: csup96/ticketing-auth
+          env:
+            - name: DB_HOST
+              value: auth-db-svc
+            - name: DB_PORT
+              value: '3306'
+            - name: DB_NAME
+              value: ticketing
+            - name: DB_USERNAME
+              value: root
+            - name: DB_PASSWORD
+              value: root
 ---
 apiVersion: v1
 kind: Service

@@ -31,9 +31,9 @@ HEALTHCHECK --interval=30s CMD node /opt/node_app/app/dist/healthcheck.js
 
 WORKDIR /opt/node_app/app
 
-# 개발 환경
+# 개발 환경.
 CMD ["npm", "start"]
 
-# 운영 환경
+# 운영 환경.
 # RUN npm run build
 # CMD ["node", "dist/main"]
