@@ -1,21 +1,17 @@
-import { HttpStatus } from '@nestjs/common';
-
 import { BaseException } from './base.exception';
-
-// export class DuplicateUserException extends HttpException {
-//   constructor() {
-//     super('이메일 사용 중.', HttpStatus.CONFLICT);
-//   }
-// }
+import { Code } from '../code/code';
 
 export class DuplicateUserException extends BaseException {
-  statusCode = HttpStatus.CONFLICT;
+  public readonly code: number;
+  public readonly message: string;
+  public readonly detail: string | string[];
+  public readonly stack?: string;
 
-  constructor() {
-    super('이메일 사용 중.');
-  }
+  constructor(detail?: string | string[], message?: string) {
+    super();
 
-  serializeErrors() {
-    return [{ message: this.message, statusCode: this.statusCode }];
+    this.code = Code.CONFLICT.code;
+    this.message = message || Code.CONFLICT.message;
+    this.detail = detail;
   }
 }

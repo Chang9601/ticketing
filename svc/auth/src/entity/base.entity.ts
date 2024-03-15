@@ -17,4 +17,6 @@ export abstract class BaseEntity {
 
   @DeleteDateColumn({ type: 'timestamp' })
   deletedAt: Date;
+
+  constructor() {}
 }

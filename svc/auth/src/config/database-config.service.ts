@@ -11,6 +11,7 @@ export class DatabaseConfigService {
       password: DatabaseEnv.DB_PASSWORD,
       database: DatabaseEnv.DB_DATABASE,
       entities: [__dirname + '/../**/*.entity.js'],
+      synchronize: true,
     };
   }
 }

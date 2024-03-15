@@ -1,6 +1,6 @@
-import { get } from 'env-var';
+//import { get } from 'env-var';
 
 export class ServerEnv {
-  public static readonly HOST = get('HOST').required().asString();
-  public static readonly PORT = get('PORT').required().asPortNumber();
+  public static readonly HOST = 'localhost'; //get('HOST').required().asString();
+  public static readonly PORT = 3306; //get('PORT').required().asPortNumber();
 }
