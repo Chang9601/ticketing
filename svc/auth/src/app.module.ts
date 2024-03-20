@@ -1,7 +1,13 @@
-import { Module, ValidationPipe } from '@nestjs/common';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  ValidationPipe,
+} from '@nestjs/common';
 import { APP_FILTER, APP_PIPE } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import * as cookieParser from 'cookie-parser';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -36,4 +42,8 @@ import { AllExceptionFilter } from './filter/all-exception.filter';
     AppService,
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(cookieParser()).forRoutes('*');
+  }
+}

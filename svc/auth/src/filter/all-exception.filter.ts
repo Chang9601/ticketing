@@ -54,7 +54,7 @@ export class AllExceptionFilter implements ExceptionFilter {
       return ApiResponse.handleFailure(
         exception.code,
         exception.message,
-        exception.detail,
+        exception.details,
         exception.stack,
       );
     }

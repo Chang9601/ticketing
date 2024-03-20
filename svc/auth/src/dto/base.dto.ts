@@ -1,3 +1,3 @@
 export abstract class BaseDto {
-  id: number;
+  public id: number;
 }

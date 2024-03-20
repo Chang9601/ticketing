@@ -1,7 +1,7 @@
 import { BaseException } from './base.exception';
 import { Code } from '../code/code';
 
-export class UserNotFoundException extends BaseException {
+export class InvalidCredentialException extends BaseException {
   public readonly code: number;
   public readonly message: string;
   public readonly details: string | string[];
@@ -10,8 +10,8 @@ export class UserNotFoundException extends BaseException {
   constructor(details?: string | string[], message?: string) {
     super();
 
-    this.code = Code.NOT_FOUND.code;
-    this.message = message || Code.NOT_FOUND.message;
+    this.code = Code.BAD_REQUEST.code;
+    this.message = message || Code.BAD_REQUEST.message;
     this.details = details;
   }
 }
