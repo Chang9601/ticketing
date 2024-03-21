@@ -62,6 +62,7 @@ export class AllExceptionFilter implements ExceptionFilter {
     return ApiResponse.handleFailure(
       Code.INTERNAL_SERVER_ERROR.code,
       Code.INTERNAL_SERVER_ERROR.message,
+      null,
       exception.stack,
     );
   }

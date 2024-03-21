@@ -1,6 +1,6 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 
-import { DatabaseEnv } from './evn/database-env';
+import { DatabaseEnv } from './env/database-env';
 
 export class DatabaseConfigService {
   async createTypeOrmOptions(): Promise<TypeOrmModuleOptions> {

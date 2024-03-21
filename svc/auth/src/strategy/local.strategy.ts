@@ -1,9 +1,9 @@
 import { PassportStrategy } from '@nestjs/passport';
+import { Injectable } from '@nestjs/common';
 import { Strategy } from 'passport-local';
 
 import { AuthService } from '../module/auth.service';
-import { User } from '../entity/user.entity';
-import { Injectable } from '@nestjs/common';
+import { UserPayload } from '../type/auth-type';
 
 // Passport 전략 구성 요소.
 // 1. 전략 선택 사항들의 집합(e.g., JWT 전략의 경우 토큰을 서명하기 위한 비밀.).
@@ -20,9 +20,10 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
 
   // 검증 콜백을 제공하기 위해서 하위 클래스에서 validate() 메서드를 구현한다.
   // 모든 Passport 전략의 validate() 메서드는 자격 증명이 어떻게 표현되는지의 세부 사항만 다를 뿐 유사한 패턴을 따른다.
-  // 사용자를 찾고 자격 증명이 유효한 경우 Passport가 작업을 완료할 수 있도록(e.g., Request 객체에 사용자 속성을 생성.) 사용자가 반환되고 요청 처리 파이프라인이 진행된다.
+  // 사용자를 찾고 자격 증명이 유효한 경우 Passport가 작업을 완료할 수 있도록(e.g., Request 객체에 user 속성을 생성.) 사용자가 반환되고 요청 처리 파이프라인이 진행된다.
   // 사용자를 찾지 못한 경우 예외를 던지고 예외 처리 계층이 처리한다.
-  public async validate(email: string, password: string): Promise<User> {
+  // 일반적으로 각 전략의 validate() 메서드에서 유일한 중요한 차이점은 사용자가 존재하고 유효한지를 결정하는 방법이다.
+  public async validate(email: string, password: string): Promise<UserPayload> {
     return await this.authService.validate(email, password);
   }
 }
