@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { Repository } from 'typeorm';
 
-import { User } from '../entity/user.entity';
+import { UserEntity } from '../entity/user.entity';
 import { ApiResponse } from '../api/api-response';
 import { Code } from '../code/code';
 import { DuplicateUserException } from '../exception/duplicate-user.exception';
@@ -18,11 +18,13 @@ import { ServerEnv } from '../config/env/server-env';
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectRepository(User) private readonly userRepository: Repository<User>,
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
     private jwtSerivce: JwtService,
   ) {}
 
-  public async create(user: User): Promise<ApiResponse<UserDto>> {
+  public async create(userDto: UserDto): Promise<ApiResponse<UserDto>> {
+    const user = UserMapper.toEntity(userDto);
     const { email, password } = user;
 
     const userExists = await this.userRepository.exists({ where: { email } });
@@ -88,7 +90,7 @@ export class AuthService {
   }
 
   public async findOne(id: number): Promise<UserPayload> {
-    const userExists = await this.userRepository.findOne({ where: { id } });
+    const userExists = await this.userRepository.exists({ where: { id } });
 
     if (!userExists) {
       throw new UserNotFoundException('사용자가 존재하지 않습니다.');

@@ -9,4 +9,11 @@ export class UserDto extends BaseDto {
 
   @IsString()
   public password: string;
+
+  constructor(email?: string, password?: string) {
+    super();
+
+    this.email = email || '';
+    this.password = password || '';
+  }
 }

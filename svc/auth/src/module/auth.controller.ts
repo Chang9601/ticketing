@@ -14,7 +14,6 @@ import { Response } from 'express';
 import { AuthService } from './auth.service';
 import { ApiResponse } from '../api/api-response';
 import { UserDto } from '../dto/user.dto';
-import { UserMapper } from '../mapper/user-mapper';
 import { LocalAuthGuard } from '../guard/local-auth.guard';
 import { RequestWithUser, UserPayload } from '../type/auth-type';
 import { JwtAuthGuard } from '../guard/jwt-auth.guard';
@@ -27,7 +26,7 @@ export class AuthController {
   @Post('/sign-up')
   @HttpCode(HttpStatus.CREATED)
   public async signUp(@Body() userDto: UserDto): Promise<ApiResponse<UserDto>> {
-    return this.authService.create(UserMapper.toEntity(userDto));
+    return this.authService.create(userDto);
   }
 
   // 경로에서 passport-local 전략이 호출되는 방법을 다음과 같다.

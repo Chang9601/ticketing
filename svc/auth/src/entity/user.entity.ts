@@ -3,10 +3,17 @@ import { Column, Entity } from 'typeorm';
 import { BaseEntity } from './base.entity';
 
 @Entity({ name: 'users' })
-export class User extends BaseEntity {
+export class UserEntity extends BaseEntity {
   @Column({ type: 'varchar', unique: true, nullable: false })
   email: string;
 
   @Column({ type: 'varchar', nullable: false })
   password: string;
+
+  constructor(email?: string, password?: string) {
+    super();
+
+    this.email = email || '';
+    this.password = password || '';
+  }
 }
