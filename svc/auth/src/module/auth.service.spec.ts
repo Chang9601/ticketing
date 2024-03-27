@@ -8,9 +8,15 @@ import { UserEntity } from '../entity/user.entity';
 import { UserDto } from '../dto/user.dto';
 import { Password } from '../util/password';
 import { DuplicateUserException } from '../exception/duplicate-user.exception';
+import { InvalidCredentialException } from '../exception/invalid-credential.exception';
+import { UserNotFoundException } from '../exception/user-not-found.exception';
+import { Code } from '../code/code';
+import { TokenPayload, UserPayload } from '../type/auth-type';
 
 const userDto = new UserDto('abc@naver.com', '1234');
 const userEntity = new UserEntity('abc@naver.com', '1234');
+const userPayload: UserPayload = { id: userEntity.id, email: userEntity.email };
+const tokenPayload: TokenPayload = { id: userEntity.id };
 
 describe('AuthService', () => {
   let authService: AuthService;
@@ -26,12 +32,14 @@ describe('AuthService', () => {
             create: jest.fn().mockReturnValue(userEntity),
             exists: jest.fn(),
             findOne: jest.fn(),
-            save: jest.fn(),
+            save: jest.fn().mockResolvedValue(userEntity),
           },
         },
         {
           provide: JwtService,
-          useValue: {},
+          useValue: {
+            signAsync: jest.fn().mockResolvedValue('jwt-token'),
+          },
         },
       ],
     }).compile();
@@ -48,19 +56,17 @@ describe('AuthService', () => {
 
   describe('create', () => {
     it('사용자를 생성해야 한다.', async () => {
-      jest.spyOn(userRepository, 'save').mockResolvedValueOnce(userEntity);
+      jest.spyOn(userRepository, 'exists').mockResolvedValueOnce(false);
 
       const user = await authService.create(userDto);
 
       expect(user).toBeDefined();
-      expect(user.metadata.code).toBe(201);
+      expect(user.metadata.code).toBe(Code.CREATED.code);
       expect(user.data.password).toBe('');
     });
 
     it('이미 사용 중인 이메일로 회원가입을 시도하기 때문에 실패한다.', async () => {
-      jest
-        .spyOn(userRepository, 'save')
-        .mockRejectedValueOnce(new DuplicateUserException());
+      jest.spyOn(userRepository, 'exists').mockResolvedValueOnce(true);
 
       await expect(authService.create(userDto)).rejects.toThrow(
         DuplicateUserException,
@@ -78,10 +84,57 @@ describe('AuthService', () => {
         }),
       );
 
-      const user = await authService.validate(userDto.email, userDto.password);
+      const userPayload = await authService.validate(
+        userDto.email,
+        userDto.password,
+      );
 
-      expect(user).toBeDefined();
-      expect(user.email).toBe(userEntity.email);
+      expect(userPayload).toBeDefined();
+      expect(userPayload.email).toBe(userEntity.email);
+    });
+
+    it('이메일이 유효하지 않아 사용자 검증에 실패한다.', async () => {
+      jest.spyOn(userRepository, 'exists').mockResolvedValueOnce(false);
+
+      await expect(
+        authService.validate(userDto.email, userDto.password),
+      ).rejects.toThrow(new InvalidCredentialException());
+    });
+
+    it('비밀번호가 유효하지 않아 사용자 검증에 실패한다.', async () => {
+      jest.spyOn(userRepository, 'exists').mockResolvedValueOnce(true);
+      jest.spyOn(userRepository, 'findOne').mockResolvedValueOnce(userEntity);
+
+      await expect(
+        authService.validate(userDto.email, userDto.password),
+      ).rejects.toThrow(new InvalidCredentialException());
+    });
+  });
+
+  describe('signIn', () => {
+    it('JWT 토큰을 가지고 있는 쿠키를 생성한다.', async () => {
+      const cookie = await authService.signIn(userPayload);
+
+      expect(cookie).toBeDefined();
+    });
+  });
+
+  describe('findOne', () => {
+    it('아이디로 사용자를 찾아야 한다.', async () => {
+      jest.spyOn(userRepository, 'exists').mockResolvedValueOnce(true);
+      jest.spyOn(userRepository, 'findOne').mockResolvedValueOnce(userEntity);
+
+      const userPayload = await authService.findOne(tokenPayload.id);
+
+      expect(userPayload.email).toBe(userEntity.email);
+    });
+
+    it('아이디가 유효하지 않아 사용자를 찾지 못한다.', async () => {
+      jest.spyOn(userRepository, 'exists').mockResolvedValueOnce(false);
+
+      await expect(authService.findOne(tokenPayload.id)).rejects.toThrow(
+        new UserNotFoundException(),
+      );
     });
   });
 });
